@@ -13,9 +13,6 @@ set -eu
 REPO="${OPENLM_REPO:-uttam-openlm/helmcharts}"
 INSTALL_DIR="${OPENLM_INSTALL_DIR:-/usr/local/bin}"
 BIN="openlm"
-# GoReleaser tags this release stream with an installer/ prefix (installer/vX.Y.Z)
-# so that the installer tag is distinct from any future helmcharts-wide tags.
-TAG_PREFIX="installer/"
 
 err() { echo "error: $*" >&2; exit 1; }
 info() { echo "$*" >&2; }
@@ -48,18 +45,15 @@ esac
 version="${OPENLM_VERSION:-}"
 if [ -z "$version" ]; then
   info "Resolving latest ${BIN} release from ${REPO}..."
-  # Releases are tagged installer/vX.Y.Z; the GitHub releases/latest API
-  # redirects to the most-recent non-prerelease (any tag). We strip the
-  # installer/ prefix and the leading v to get a bare semver.
   api="https://api.github.com/repos/${REPO}/releases/latest"
   version=$($DL "$api" \
-    | grep -o '"tag_name"[[:space:]]*:[[:space:]]*"[^"]*"' \
+    | grep -o '"tag_name"[[:space:]]*:[[:space:]]*"v[^"]*"' \
     | head -n 1 \
-    | sed -E "s/.*\"${TAG_PREFIX}v([^\"]+)\".*/\1/")
+    | sed -E 's/.*"v([^"]+)".*/\1/')
   [ -n "$version" ] || err "could not find a release in ${REPO} (set OPENLM_VERSION to install a specific version)"
 fi
 version="${version#v}"   # tolerate a leading 'v' in OPENLM_VERSION
-tag="${TAG_PREFIX}v${version}"
+tag="v${version}"
 
 asset="openlm_${version}_${os}_${arch}.tar.gz"
 base="https://github.com/${REPO}/releases/download/${tag}"
