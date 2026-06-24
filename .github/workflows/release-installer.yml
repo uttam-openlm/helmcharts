@@ -2,16 +2,6 @@ name: release-installer
 
 # Publishes the `openlm` installer CLI as a PUBLIC GitHub Release on this repo.
 #
-# The installer SOURCE lives in a separate PRIVATE repo
-# (uttam-openlm/helmcharts-installer). It is checked out into installer/ at
-# build time, so the source is never committed to this public repo.
-#
-# GoReleaser runs from the installer/ workdir using the standalone
-# .goreleaser.yaml from the private repo (no monorepo config needed).
-# GORELEASER_CURRENT_TAG strips the installer/ prefix so GoReleaser sees a
-# clean vX.Y.Z. GITHUB_TOKEN + GITHUB_REPOSITORY (auto-set to this public repo)
-# tell GoReleaser to publish the release here.
-#
 # Requirements:
 #   - Secret INSTALLER_SRC_TOKEN: a read-only token (fine-grained PAT or deploy
 #     key) that can clone uttam-openlm/helmcharts-installer.
@@ -52,6 +42,9 @@ jobs:
       - name: Extract version (strip installer/ prefix from tag)
         id: version
         run: echo "tag=${GITHUB_REF_NAME#installer/}" >> "$GITHUB_OUTPUT"
+
+      - name: Tag installer source HEAD so GoReleaser can resolve the version
+        run: git -C installer tag "${{ steps.version.outputs.tag }}"
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
