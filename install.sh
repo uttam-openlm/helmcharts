@@ -107,9 +107,30 @@ fi
 
 info ""
 info "Installed openlm to $dest"
+
+# --- Add install dir to PATH if not already there ----------------------------
+install_dir="$(dirname "$dest")"
 case ":$PATH:" in
-  *":$(dirname "$dest"):"*) : ;;
-  *) info "warn: $(dirname "$dest") is not on your PATH — add it to use 'openlm' directly" ;;
+  *":${install_dir}:"*) : ;;  # already on PATH
+  *)
+    # Detect the user's shell profile and append an export line
+    profile=""
+    case "${SHELL:-}" in
+      */zsh)  profile="$HOME/.zshrc" ;;
+      */fish) profile="$HOME/.config/fish/config.fish" ;;
+      *)      profile="$HOME/.bashrc" ;;
+    esac
+    if [ -n "$profile" ]; then
+      if [ "${SHELL:-}" = "*/fish" ]; then
+        line="fish_add_path $install_dir"
+      else
+        line="export PATH=\"${install_dir}:\$PATH\""
+      fi
+      printf '\n# openlm installer\n%s\n' "$line" >> "$profile"
+      info "Added $install_dir to PATH in $profile"
+      info "Run:  export PATH=\"${install_dir}:\$PATH\"  (or open a new shell)"
+    fi
+  ;;
 esac
 
 # --- Runtime prerequisites (non-fatal) + next steps --------------------------
