@@ -1,0 +1,64 @@
+
+# GoReleaser config for the `openlm` installer CLI.
+# The Go module lives in installer/ (a monorepo subdir alongside the Helm charts),
+# so monorepo mode scopes builds/changelog to installer/ and fires only on
+# `installer/v*` tags. Release owner/repo is intentionally omitted — GoReleaser
+# detects it from the repo the GitHub Action runs in, so this works on the fork
+# and on upstream openlm-helm/helmcharts without edits.
+#
+# Local checks (no publish):
+#   goreleaser check
+#   goreleaser build --snapshot --clean
+version: 2
+
+monorepo:
+  tag_prefix: installer/
+  dir: installer
+
+builds:
+  - id: openlm
+    main: .
+    binary: openlm
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X github.com/openlm-helm/installer/cmd.version={{ .Version }}
+      - -X github.com/openlm-helm/installer/cmd.commit={{ .Commit }}
+      - -X github.com/openlm-helm/installer/cmd.date={{ .Date }}
+
+archives:
+  - id: default
+    name_template: "openlm_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-snapshot-{{ .ShortCommit }}"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+release:
+  draft: false
+  prerelease: auto
+  name_template: "openlm {{ .Version }}"

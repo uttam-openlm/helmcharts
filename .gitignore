@@ -1,0 +1,41 @@
+# Installer CLI source lives in a separate PRIVATE repo
+# (uttam-openlm/helmcharts-installer). It is checked out into installer/ at
+# release time by .github/workflows/release-installer.yml and must never be
+# committed here, so the whole directory is ignored.
+/installer/
+
+# Go build output / binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+docs/*
+
+# Go workspace / module cache
+vendor/
+
+# Docs build artifacts (LaTeX)
+docs/build.log
+docs/*.aux
+docs/*.fdb_latexmk
+docs/*.fls
+docs/*.log
+docs/*.out
+docs/*.toc
+docs/*.synctex.gz
+docs/*.bbl
+docs/*.blg
+docs/*.lof
+docs/*.lot
+docs/*.nav
+docs/*.snm
+docs/*.pdf
+docs/*.docx
+docs/*.tex
+
+# Editor / OS
+.DS_Store
+*.swp
