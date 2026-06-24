@@ -4,10 +4,13 @@ name: release-installer
 #
 # The installer SOURCE lives in a separate PRIVATE repo
 # (uttam-openlm/helmcharts-installer). It is checked out into installer/ at
-# build time, so the source is never committed to this public repo. GoReleaser
-# runs in monorepo mode (tag_prefix: installer/, dir: installer, see
-# .goreleaser.yaml) and publishes via the built-in GITHUB_TOKEN, so the release
-# assets are public on this repo.
+# build time, so the source is never committed to this public repo.
+#
+# GoReleaser runs from the installer/ workdir using the standalone
+# .goreleaser.yaml from the private repo (no monorepo config needed).
+# GORELEASER_CURRENT_TAG strips the installer/ prefix so GoReleaser sees a
+# clean vX.Y.Z. GITHUB_TOKEN + GITHUB_REPOSITORY (auto-set to this public repo)
+# tell GoReleaser to publish the release here.
 #
 # Requirements:
 #   - Secret INSTALLER_SRC_TOKEN: a read-only token (fine-grained PAT or deploy
@@ -27,7 +30,7 @@ jobs:
   goreleaser:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout helmcharts (release target — holds the tag + .goreleaser.yaml)
+      - name: Checkout helmcharts (holds the tag)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -46,10 +49,16 @@ jobs:
           go-version: "1.24"
           cache-dependency-path: installer/go.sum
 
+      - name: Extract version (strip installer/ prefix from tag)
+        id: version
+        run: echo "tag=${GITHUB_REF_NAME#installer/}" >> "$GITHUB_OUTPUT"
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           version: "~> v2"
           args: release --clean
+          workdir: installer
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ steps.version.outputs.tag }}
