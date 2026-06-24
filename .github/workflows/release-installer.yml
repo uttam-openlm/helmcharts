@@ -1,0 +1,55 @@
+name: release-installer
+
+# Publishes the `openlm` installer CLI as a PUBLIC GitHub Release on this repo.
+#
+# The installer SOURCE lives in a separate PRIVATE repo
+# (uttam-openlm/helmcharts-installer). It is checked out into installer/ at
+# build time, so the source is never committed to this public repo. GoReleaser
+# runs in monorepo mode (tag_prefix: installer/, dir: installer, see
+# .goreleaser.yaml) and publishes via the built-in GITHUB_TOKEN, so the release
+# assets are public on this repo.
+#
+# Requirements:
+#   - Secret INSTALLER_SRC_TOKEN: a read-only token (fine-grained PAT or deploy
+#     key) that can clone uttam-openlm/helmcharts-installer.
+#
+# Cut a release by pushing a tag on THIS repo, e.g.:
+#   git tag installer/v1.2.3 && git push origin installer/v1.2.3
+on:
+  push:
+    tags:
+      - "installer/v*"
+
+permissions:
+  contents: write
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout helmcharts (release target — holds the tag + .goreleaser.yaml)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout private installer source into installer/
+        uses: actions/checkout@v4
+        with:
+          repository: uttam-openlm/helmcharts-installer
+          token: ${{ secrets.INSTALLER_SRC_TOKEN }}
+          path: installer
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache-dependency-path: installer/go.sum
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
