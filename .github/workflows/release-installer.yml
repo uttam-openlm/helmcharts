@@ -46,6 +46,9 @@ jobs:
       - name: Tag installer source HEAD so GoReleaser can resolve the version
         run: git -C installer tag "${{ steps.version.outputs.tag }}"
 
+      - name: Point installer remote at public repo so GoReleaser publishes there
+        run: git -C installer remote set-url origin https://github.com/${{ github.repository }}.git
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
