@@ -31,7 +31,7 @@ os=$(uname -s | tr '[:upper:]' '[:lower:]')
 case "$os" in
   linux)  os=linux  ;;
   darwin) os=darwin ;;
-  *) err "unsupported OS '$os' (supported: linux, darwin). On Windows, download the .zip from https://github.com/$REPO/releases" ;;
+  *) err "unsupported OS '$os' (supported: linux, darwin). On Windows, run in PowerShell:  irm https://raw.githubusercontent.com/$REPO/main/install.ps1 | iex" ;;
 esac
 
 arch=$(uname -m)
