@@ -1,0 +1,17 @@
+dag:
+  - name: infra
+    dependencies:
+      - name: mongodb
+      - name: redis
+      - name: redisui
+      - name: kafka
+      - name: kafkaui
+      - name: kafkainitpod
+
+  - name: identity
+    dependencies:
+       - name: identity
+         dependencies:
+           - name: mongodb
+           - name: redis
+           - name: kafka
