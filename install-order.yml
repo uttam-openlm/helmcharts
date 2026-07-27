@@ -1,6 +1,6 @@
 - kafka
 - kafkainitpod
-- kafkaui
+- kafka-ui
 - mongodb
 - redis
 - redisui

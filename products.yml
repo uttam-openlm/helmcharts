@@ -5,7 +5,7 @@ dag:
       - name: redis
       - name: redisui
       - name: kafka
-      - name: kafkaui
+      - name: kafka-ui
       - name: kafkainitpod
 
   - name: identity
