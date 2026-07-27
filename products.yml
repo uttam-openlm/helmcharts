@@ -17,6 +17,6 @@ dag:
            - name: kafka
 
 config:
-    - openlm_config_generic
-    - openlm_logging_config_generic
-    - openlm_telemetry_config_generic
+    - openlm-config-generic
+    - openlm-logging-config-generic
+    - openlm-telemetry-config-generic
