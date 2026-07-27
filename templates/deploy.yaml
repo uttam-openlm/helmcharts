@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: apps.deployment-openlm-{{ .Values.deployment.name }}
+  name: {{ .Values.deployment.name }}
+  namespace: {{ .Values.deployment.namespace }}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: apps.deployment-openlm-{{ .Values.deployment.name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: apps.deployment-openlm-{{ .Values.deployment.name }}
+      namespace: {{ .Values.deployment.namespace }}
+    spec:
+      {{- if .Values.affinity }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: openlm.com/role
+                    operator: In
+                    values:
+                      - {{ .Values.affinity }}
+      {{- end }}
+      {{- if .Values.taints }}
+      tolerations:
+        - key: "openlm.com/role"
+          operator: "Equal"
+          value: {{ .Values.taints }}
+          effect: "NoSchedule"
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.securityContext.pod | nindent 8 }}
+      containers:
+        - image: {{ .Values.deployment.image }}
+          #command: ["sleep","infinity"]
+          {{ if .Values.debug }}
+          command: ["sleep", "infinity"]
+          {{ end }}
+                    
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext.container | nindent 12 }}
+          {{ if or (.Values.deploymentCerts.enabled) (.Values.secrets) }}
+          volumeMounts:
+          {{ if .Values.deploymentCerts.enabled }}
+            - name: ca-tls-configmap
+              mountPath: {{ .Values.deploymentCerts.containerMountPath }}
+              subPath: {{ .Values.deploymentCerts.configMapFileName }}
+              readOnly: true
+          {{ end }}
+          {{- if .Values.secrets }}
+          {{- range .Values.secrets }}
+          {{- if eq .type "file" }}
+            - name: {{ .name }}
+              mountPath: {{ .path }}
+              readOnly: true
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{ end }}
+          envFrom:
+          - configMapRef:
+              name: {{ .Values.generic.name }}
+          {{ if .Values.configmap }}
+          - configMapRef:
+              name: {{ .Values.configmap.name }}
+          {{ end }}
+          - configMapRef:
+              name: {{ .Values.logging.name }}
+          - configMapRef:
+              name: {{ .Values.telemetry.name }}
+          {{- if .Values.secrets }}
+          {{- range .Values.secrets }}
+          {{- if eq .type "env" }}
+          - secretRef:
+              name: {{ .name }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          imagePullPolicy: IfNotPresent
+          name: {{ .Values.deployment.name }}
+          ports:
+            - containerPort: {{ .Values.deployment.ports.containerPort }}
+              name: {{ .Values.deployment.ports.name }}
+              protocol: TCP
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      {{ if or (.Values.deploymentCerts.enabled) (.Values.secrets) }}
+      volumes:
+      {{ if .Values.deploymentCerts.enabled }}
+        - name: ca-tls-configmap
+          configMap:
+            name: {{ .Values.deploymentCerts.name }}
+            items:
+              - key: {{ .Values.deploymentCerts.configMapKeyName }}
+                path: {{ .Values.deploymentCerts.configMapFileName }}
+      {{ end }}
+      {{- if .Values.secrets }}
+      {{- range .Values.secrets }}
+      {{- if eq .type "file" }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .name }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      {{ end }}
+      {{ if .Values.imagePullSecrets.name }}
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecrets.name }}
+      {{ end }}
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+            
+            
+                   

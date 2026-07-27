@@ -1,0 +1,64 @@
+deployment:
+  name: openlm-agentactivitymanager
+  namespace: openlm
+  image: public.ecr.aws/r3q3q2f4/olm-agentactivitymanager:1.260515.1613
+  ports:
+    containerPort: 5038
+    name: actmanager5038
+resources:
+  requests:
+    memory: "350Mi"
+    cpu: "15m"
+  limits:
+    memory: "500Mi"
+imagePullSecrets:
+  name: 
+namespace: openlm
+taints: main
+affinity: main
+generic:
+  name: openlm-config-generic
+logging:
+  name: openlm-logging-config-generic
+telemetry:
+  name: openlm-telemetry-config-generic
+secrets:
+  - name: openlm-generic-mongo-db-credentials
+    type: env
+  - name: openlm-generic-kafka-bootstrap-credentials
+    type: env
+  - name: openlm-generic-redis-connection-credentials
+    type: env
+securityContext:
+  pod:
+    fsGroup: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  container:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+deploymentCerts:
+  enabled: False
+  name: 
+  containerMountPath: 
+  configMapFileName: 
+  configMapKeyName: 
+service:
+  ports:
+    name: actmanager5038
+    port: 5038
+    targetPort: 5038
+  name: openlm-agentactivitymanager
+  namespace: openlm
+ingressAnnotations:
+  nginx.ingress.kubernetes.io/rewrite-target: /$2
+  nginx.ingress.kubernetes.io/use-regex: 'true'
+kafkaconfig:
+  name: 
+kafka_cluster:
+  name: 
