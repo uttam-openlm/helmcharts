@@ -39,3 +39,4 @@ docs/*.tex
 # Editor / OS
 .DS_Store
 *.swp
+installer/helm-publish-flow.md
