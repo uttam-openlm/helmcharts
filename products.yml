@@ -1,5 +1,5 @@
 dag:
-  - name: infra
+  - name: base
     dependencies:
       - name: mongodb
       - name: redis
@@ -17,6 +17,6 @@ dag:
            - name: kafka
 
 config:
-    - openlm-config-generic
-    - openlm-logging-config-generic
-    - openlm-telemetry-config-generic
+    - openlm_config_generic
+    - openlm_logging_config_generic
+    - openlm_telemetry_config_generic
