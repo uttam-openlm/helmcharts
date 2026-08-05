@@ -1,22 +1,39 @@
 dag:
-  - name: base
-    dependencies:
-      - name: mongodb
-      - name: redis
-      - name: redisui
-      - name: kafka
-      - name: kafka-ui
-      - name: kafkainitpod
-
-  - name: identity
-    dependencies:
-       - name: identity
-         dependencies:
-           - name: mongodb
-           - name: redis
-           - name: kafka
-
-config:
-    - openlm_config_generic
-    - openlm_logging_config_generic
-    - openlm_telemetry_config_generic
+    -   dependencies:
+        -   name: homepage
+            node_type: deployment
+        -   dependencies:
+            -   name: homepage
+                node_type: deployment
+            name: homepageui
+            node_type: deployment
+        -   dependencies:
+            -   name: mongodb
+                node_type: deployment
+            -   name: kafka
+                node_type: deployment
+            name: identity
+            node_type: deployment
+        -   dependencies:
+            -   dependencies:
+                -   name: mongodb
+                    node_type: deployment
+                -   name: kafka
+                    node_type: deployment
+                name: identity
+                node_type: deployment
+            name: identityui
+            node_type: deployment
+        -   name: identityapi
+            node_type: deployment
+        name: p1
+        node_type: product
+    -   dependencies:
+        -   name: mongodb
+            node_type: deployment
+        -   name: redis
+            node_type: deployment
+        -   name: kafka
+            node_type: deployment
+        name: base
+        node_type: product
