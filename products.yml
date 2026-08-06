@@ -1,4 +1,5 @@
 dag:
+-   dependencies:
     -   dependencies:
         -   dependencies:
             -   dependencies:
@@ -12,6 +13,7 @@ dag:
             node_type: deployment
         name: homepage
         node_type: deployment
+    -   dependencies:
         -   dependencies:
             -   dependencies:
                 -   dependencies:
@@ -27,6 +29,14 @@ dag:
             node_type: deployment
         name: homepageui
         node_type: deployment
+    -   dependencies:
+        -   name: mongodb
+            node_type: deployment
+        -   name: kafka
+            node_type: deployment
+        name: identity
+        node_type: deployment
+    -   dependencies:
         -   dependencies:
             -   name: mongodb
                 node_type: deployment
@@ -34,39 +44,30 @@ dag:
                 node_type: deployment
             name: identity
             node_type: deployment
-        -   dependencies:
-            -   dependencies:
-                -   name: mongodb
-                    node_type: deployment
-                -   name: kafka
-                    node_type: deployment
-                name: identity
-                node_type: deployment
-            name: identityui
-            node_type: deployment
-        -   dependencies:
-            -   dependencies:
-                -   name: mongodb
-                    node_type: deployment
-                -   name: kafka
-                    node_type: deployment
-                name: identity
-                node_type: deployment
-            name: identityapi
-            node_type: deployment
-        name: p1
-        node_type: product
+        name: identityui
+        node_type: deployment
     -   dependencies:
-        -   name: mongodb
+        -   dependencies:
+            -   name: mongodb
+                node_type: deployment
+            -   name: kafka
+                node_type: deployment
+            name: identity
             node_type: deployment
-        -   name: redis
-            node_type: deployment
-        -   name: kafka
-            node_type: deployment
-        name: base
-        node_type: product
-
+        name: identityapi
+        node_type: deployment
+    name: p1
+    node_type: product
+-   dependencies:
+    -   name: mongodb
+        node_type: deployment
+    -   name: redis
+        node_type: deployment
+    -   name: kafka
+        node_type: deployment
+    name: base
+    node_type: product
 config:
-    - openlm_config_generic
-    - openlm_logging_config_generic
-    - openlm_telemetry_config_generic
+- openlm_config_generic
+- openlm_logging_config_generic
+- openlm_telemetry_config_generic
