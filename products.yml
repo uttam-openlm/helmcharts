@@ -30,7 +30,15 @@ dag:
                 node_type: deployment
             name: identityui
             node_type: deployment
-        -   name: identityapi
+        -   dependencies:
+            -   dependencies:
+                -   name: mongodb
+                    node_type: deployment
+                -   name: kafka
+                    node_type: deployment
+                name: identity
+                node_type: deployment
+            name: identityapi
             node_type: deployment
         name: p1
         node_type: product
