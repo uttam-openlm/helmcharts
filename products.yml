@@ -37,3 +37,8 @@ dag:
             node_type: deployment
         name: base
         node_type: product
+
+config:
+    - openlm_config_generic
+    - openlm_logging_config_generic
+    - openlm_telemetry_config_generic
