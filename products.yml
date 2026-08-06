@@ -1,9 +1,25 @@
 dag:
     -   dependencies:
-        -   name: homepage
+        -   dependencies:
+            -   dependencies:
+                -   name: zohocrmlistener
+                    node_type: deployment
+                -   name: licensegenerator
+                    node_type: deployment
+                name: licensemanager
+                node_type: deployment
+            name: homepage
             node_type: deployment
         -   dependencies:
-            -   name: homepage
+            -   dependencies:
+                -   dependencies:
+                    -   name: zohocrmlistener
+                        node_type: deployment
+                    -   name: licensegenerator
+                        node_type: deployment
+                    name: licensemanager
+                    node_type: deployment
+                name: homepage
                 node_type: deployment
             name: homepageui
             node_type: deployment
