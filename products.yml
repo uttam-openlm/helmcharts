@@ -1,9 +1,25 @@
 dag:
 -   dependencies:
-    -   name: homepage
+    -   dependencies:
+        -   dependencies:
+            -   name: mongodb
+                node_type: deployment
+            -   name: kafka
+                node_type: deployment
+            name: identity
+            node_type: deployment
+        name: homepage
         node_type: deployment
     -   dependencies:
-        -   name: homepage
+        -   dependencies:
+            -   dependencies:
+                -   name: mongodb
+                    node_type: deployment
+                -   name: kafka
+                    node_type: deployment
+                name: identity
+                node_type: deployment
+            name: homepage
             node_type: deployment
         name: homepageui
         node_type: deployment
