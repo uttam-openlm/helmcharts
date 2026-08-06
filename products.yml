@@ -1,18 +1,32 @@
 dag:
     -   dependencies:
         -   dependencies:
-            -   name: licensemanager
+            -   dependencies:
+                -   name: mongodb
+                    node_type: deployment
+                -   name: kafka
+                    node_type: deployment
+                name: identity
+                node_type: deployment
+            name: licensemanager
+            node_type: deployment
+        name: homepage
+        node_type: deployment
+        -   dependencies:
+            -   dependencies:
+                -   dependencies:
+                    -   name: mongodb
+                        node_type: deployment
+                    -   name: kafka
+                        node_type: deployment
+                    name: identity
+                    node_type: deployment
+                name: licensemanager
                 node_type: deployment
             name: homepage
             node_type: deployment
-        -   dependencies:
-            -   dependencies:
-                -   name: licensemanager
-                    node_type: deployment
-                name: homepage
-                node_type: deployment
-            name: homepageui
-            node_type: deployment
+        name: homepageui
+        node_type: deployment
         -   dependencies:
             -   name: mongodb
                 node_type: deployment
